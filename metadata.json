@@ -1,0 +1,7 @@
+{
+  "name": "StudyAbroad Genius - Agency Pro",
+  "description": "A comprehensive CRM and AI-powered platform for education consultancies. (Restore Point X1)",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
