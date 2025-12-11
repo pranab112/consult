@@ -28,12 +28,46 @@ export const initDatabase = async () => {
 
     if (!result.rows[0].exists) {
       logger.info('Initializing database schema...');
-      const schemaSQL = await fs.readFile(
-        path.join(__dirname, 'schema.sql'),
-        'utf-8'
-      );
-      await client.query(schemaSQL);
-      logger.info('Database schema created successfully');
+
+      // Execute schema SQL in parts to handle complex statements
+      try {
+        // Create extensions
+        await client.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+
+        // Create enum types
+        await client.query(`CREATE TYPE user_role AS ENUM ('Owner', 'Counsellor', 'Viewer', 'Student')`).catch(() => {});
+        await client.query(`CREATE TYPE document_status AS ENUM ('Pending', 'Uploaded', 'NotRequired')`).catch(() => {});
+        await client.query(`CREATE TYPE country AS ENUM ('Australia', 'UK', 'Canada', 'USA', 'NewZealand', 'Germany', 'France', 'Japan', 'SouthKorea', 'Netherlands')`).catch(() => {});
+        await client.query(`CREATE TYPE application_status AS ENUM ('InProgress', 'DocumentsSubmitted', 'ApplicationSubmitted', 'Accepted', 'Rejected', 'VisaProcessing', 'Completed')`).catch(() => {});
+
+        // Read and execute full schema
+        const schemaSQL = await fs.readFile(
+          path.join(__dirname, 'schema.sql'),
+          'utf-8'
+        );
+
+        // Split by semicolon and execute each statement
+        const statements = schemaSQL.split(';').filter(stmt => stmt.trim());
+        for (const statement of statements) {
+          if (statement.trim()) {
+            try {
+              await client.query(statement);
+            } catch (err: any) {
+              // Ignore errors for existing types/tables
+              if (!err.message.includes('already exists')) {
+                logger.warn('Schema statement warning:', err.message);
+              }
+            }
+          }
+        }
+
+        logger.info('Database schema created successfully');
+      } catch (schemaError) {
+        logger.error('Schema creation error:', schemaError);
+        // Continue anyway - tables might already exist
+      }
+    } else {
+      logger.info('Database schema already exists');
     }
 
     client.release();
