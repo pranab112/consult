@@ -47,6 +47,7 @@ app.use('/api/documents', documentsRouter);
 app.use('/api/agencies', agenciesRouter);
 
 // Serve static files from React build
+// In production, __dirname is backend/dist, so we go up 2 levels to reach root
 const frontendPath = path.join(__dirname, '../../dist');
 app.use(express.static(frontendPath));
 
@@ -56,10 +57,14 @@ app.get('*', (req, res) => {
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
+    // Debug info to understand the path structure
     res.status(404).json({
       message: 'Frontend not built. Run npm run build:frontend',
       api: 'API is working at /api/*',
-      health: 'Check /health for status'
+      health: 'Check /health for status',
+      lookingFor: indexPath,
+      dirname: __dirname,
+      cwd: process.cwd()
     });
   }
 });
