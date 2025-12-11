@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { pool } from '../db/init';
 import { authenticate, AuthRequest } from '../middleware/auth';
@@ -33,7 +33,7 @@ router.post('/',
     body('email').isEmail().normalizeEmail(),
     body('phone').notEmpty().trim()
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

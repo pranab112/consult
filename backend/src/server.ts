@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(rateLimiter);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
