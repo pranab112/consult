@@ -20,16 +20,29 @@ const app = express();
 const server = createServer(app);
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
-// Helmet disabled to avoid CSP conflicts
-// app.use(helmet());
+// Completely disable all security headers to fix CSP issues
+// Railway or other proxies might be adding them
 
-// Set permissive CSP that allows Tailwind and other CDNs
+// Force remove all possible CSP-related headers
 app.use((req, res, next) => {
+  // Remove any existing CSP headers
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('Content-Security-Policy-Report-Only');
+  res.removeHeader('X-Content-Security-Policy');
+  res.removeHeader('X-WebKit-CSP');
+
+  // Set the most permissive CSP possible
   res.setHeader('Content-Security-Policy',
-    "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
-    "script-src * 'unsafe-inline' 'unsafe-eval'; " +
-    "style-src * 'unsafe-inline';"
+    "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+    "script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+    "connect-src * data: blob: 'unsafe-inline'; " +
+    "img-src * data: blob: 'unsafe-inline'; " +
+    "frame-src * data: blob: ; " +
+    "style-src * data: blob: 'unsafe-inline'; " +
+    "font-src * data: blob: 'unsafe-inline'; " +
+    "media-src * data: blob: 'unsafe-inline';"
   );
+
   next();
 });
 
@@ -78,11 +91,19 @@ app.use('/api/agencies', agenciesRouter);
 // In production, __dirname is backend/dist, so we go up 2 levels to reach root
 const frontendPath = path.join(__dirname, '../../dist');
 app.use(express.static(frontendPath, {
-  setHeaders: (res, path) => {
-    // Remove CSP for HTML files to allow Tailwind CDN
-    if (path.endsWith('.html')) {
-      res.removeHeader('Content-Security-Policy');
-    }
+  setHeaders: (res, filePath) => {
+    // Override all security headers for static files
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('Content-Security-Policy-Report-Only');
+    res.removeHeader('X-Content-Security-Policy');
+    res.removeHeader('X-WebKit-CSP');
+
+    // Set permissive CSP for all static files
+    res.setHeader('Content-Security-Policy',
+      "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+      "script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+      "style-src * data: blob: 'unsafe-inline';"
+    );
   }
 }));
 
@@ -96,10 +117,15 @@ app.use((req, res, next) => {
   const indexPath = path.join(__dirname, '../../dist/index.html');
 
   if (require('fs').existsSync(indexPath)) {
-    // Remove any CSP headers before sending
-    res.removeHeader('Content-Security-Policy');
-    res.removeHeader('X-Content-Security-Policy');
-    res.removeHeader('X-WebKit-CSP');
+    // Force permissive CSP for the React app
+    res.setHeader('Content-Security-Policy',
+      "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+      "script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+      "connect-src * data: blob: 'unsafe-inline'; " +
+      "img-src * data: blob: 'unsafe-inline'; " +
+      "style-src * data: blob: 'unsafe-inline'; " +
+      "font-src * data: blob: 'unsafe-inline';"
+    );
     res.sendFile(indexPath);
   } else {
     // Debug info to understand the path structure
