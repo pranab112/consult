@@ -4,24 +4,37 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "vite",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:frontend": "vite build",
+    "build:backend": "cd backend && npm run build",
+    "start": "cd backend && npm start",
+    "preview": "vite preview",
+    "install:all": "npm install && cd backend && npm install",
+    "deploy": "./deploy-railway.sh",
+    "deploy:quick": "./quick-deploy.sh"
   },
   "dependencies": {
+    "@google/genai": "^1.30.0",
+    "firebase": "^12.6.0",
+    "jspdf": "^2.5.1",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.555.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@google/genai": "^1.30.0",
-    "lucide-react": "^0.555.0",
-    "recharts": "^3.5.1",
-    "firebase": "^12.6.0",
-    "jszip": "^3.10.1",
-    "jspdf": "^2.5.1"
+    "recharts": "^3.5.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^8.2.2",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
