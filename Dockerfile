@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 
 # Force rebuild - cache bust
-ENV REBUILD_DATE=2025-12-11-5
+ENV REBUILD_DATE=2025-12-11-6
 
 # Set working directory
 WORKDIR /app

@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
+// import helmet from 'helmet'; // Disabled to fix CSP issues
 import dotenv from 'dotenv';
 import path from 'path';
 import { createServer } from 'http';
@@ -20,17 +20,16 @@ const app = express();
 const server = createServer(app);
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
-// Middleware - use helmet without CSP
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
+// Helmet disabled to avoid CSP conflicts
+// app.use(helmet());
 
-// Explicitly remove CSP headers that might be added by Railway or other middleware
+// Set permissive CSP that allows Tailwind and other CDNs
 app.use((req, res, next) => {
-  res.removeHeader('Content-Security-Policy');
-  res.removeHeader('X-Content-Security-Policy');
-  res.removeHeader('X-WebKit-CSP');
+  res.setHeader('Content-Security-Policy',
+    "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
+    "script-src * 'unsafe-inline' 'unsafe-eval'; " +
+    "style-src * 'unsafe-inline';"
+  );
   next();
 });
 
