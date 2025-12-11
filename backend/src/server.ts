@@ -20,10 +20,20 @@ const app = express();
 const server = createServer(app);
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
-// Middleware - disable CSP for now to allow Tailwind CSS
+// Middleware - use helmet without CSP
 app.use(helmet({
-  contentSecurityPolicy: false
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
 }));
+
+// Explicitly remove CSP headers that might be added by Railway or other middleware
+app.use((req, res, next) => {
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('X-Content-Security-Policy');
+  res.removeHeader('X-WebKit-CSP');
+  next();
+});
+
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
@@ -87,6 +97,10 @@ app.use((req, res, next) => {
   const indexPath = path.join(__dirname, '../../dist/index.html');
 
   if (require('fs').existsSync(indexPath)) {
+    // Remove any CSP headers before sending
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('X-Content-Security-Policy');
+    res.removeHeader('X-WebKit-CSP');
     res.sendFile(indexPath);
   } else {
     // Debug info to understand the path structure
