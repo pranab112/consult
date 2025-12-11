@@ -14,7 +14,9 @@
     "preview": "vite preview",
     "install:all": "npm install && cd backend && npm install",
     "deploy": "./deploy-railway.sh",
-    "deploy:quick": "./quick-deploy.sh"
+    "deploy:quick": "./quick-deploy.sh",
+    "db:migrate": "cd backend && npm run db:migrate",
+    "db:migrate:prod": "cd backend && npm run db:migrate:prod"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
