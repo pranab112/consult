@@ -25,7 +25,8 @@ WORKDIR /app
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/backend ./backend
+COPY --from=builder /app/backend/dist ./backend/dist
+COPY --from=builder /app/backend/package*.json ./backend/
 COPY --from=builder /app/package*.json ./
 
 # Install production dependencies only
