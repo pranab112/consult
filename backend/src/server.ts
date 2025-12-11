@@ -68,7 +68,14 @@ app.use('/api/agencies', agenciesRouter);
 // Serve static files from React build
 // In production, __dirname is backend/dist, so we go up 2 levels to reach root
 const frontendPath = path.join(__dirname, '../../dist');
-app.use(express.static(frontendPath));
+app.use(express.static(frontendPath, {
+  setHeaders: (res, path) => {
+    // Remove CSP for HTML files to allow Tailwind CDN
+    if (path.endsWith('.html')) {
+      res.removeHeader('Content-Security-Policy');
+    }
+  }
+}));
 
 // Catch-all route for React app - must come AFTER all API routes but BEFORE error handler
 app.use((req, res, next) => {
