@@ -31,8 +31,5 @@ COPY --from=builder /app/package*.json ./
 # Install production dependencies only
 RUN cd backend && npm ci --production
 
-# Expose port
-EXPOSE 5000
-
 # Start the application
 CMD ["npm", "start"]

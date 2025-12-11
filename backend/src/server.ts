@@ -17,7 +17,7 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Middleware
 app.use(helmet());
@@ -64,8 +64,9 @@ const startServer = async () => {
       logger.warn('No DATABASE_URL found - add PostgreSQL in Railway dashboard');
     }
 
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+      logger.info(`Server is listening on http://0.0.0.0:${PORT}`);
       if (!process.env.DATABASE_URL) {
         logger.info('⚠️ Running without database - Add PostgreSQL in Railway for full functionality');
       }
