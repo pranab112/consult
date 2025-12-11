@@ -55,11 +55,11 @@ console.log('cwd:', process.cwd());
 
 app.use(express.static(frontendPath));
 
-// Catch-all route for React app - must come AFTER all API routes
-app.get('/*', (req, res) => {
-  // Skip API routes
+// Catch-all route for React app - must come AFTER all API routes but BEFORE error handler
+app.use((req, res, next) => {
+  // Skip API routes and health check
   if (req.path.startsWith('/api') || req.path === '/health') {
-    return res.status(404).json({ error: 'API endpoint not found' });
+    return next();
   }
 
   const indexPath = path.join(__dirname, '../../dist/index.html');
