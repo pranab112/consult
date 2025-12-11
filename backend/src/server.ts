@@ -49,11 +49,22 @@ app.use('/api/agencies', agenciesRouter);
 // Serve static files from React build
 // In production, __dirname is backend/dist, so we go up 2 levels to reach root
 const frontendPath = path.join(__dirname, '../../dist');
+console.log('Frontend path:', frontendPath);
+console.log('__dirname:', __dirname);
+console.log('cwd:', process.cwd());
+
 app.use(express.static(frontendPath));
 
-// Serve React app for all non-API routes
-app.get('*', (req, res) => {
+// Catch-all route for React app - must come AFTER all API routes
+app.get('/*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api') || req.path === '/health') {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+
   const indexPath = path.join(__dirname, '../../dist/index.html');
+  console.log('Looking for index.html at:', indexPath);
+
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
@@ -64,7 +75,8 @@ app.get('*', (req, res) => {
       health: 'Check /health for status',
       lookingFor: indexPath,
       dirname: __dirname,
-      cwd: process.cwd()
+      cwd: process.cwd(),
+      files: require('fs').readdirSync(path.join(__dirname, '../..')).slice(0, 10)
     });
   }
 });
