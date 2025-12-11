@@ -1,48 +1,17 @@
 import React, { useState } from 'react';
+import './index.css';
 
-interface LoginFormProps {
-  onLogin: (user: any, token: string) => void;
-}
-
-export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
+function SimpleApp() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [agencyName, setAgencyName] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    const API_BASE = 'http://localhost:5001';
-    const endpoint = isLogin ? `${API_BASE}/api/auth/login` : `${API_BASE}/api/auth/register`;
-    const body = isLogin
-      ? { email, password }
-      : { email, password, name, agencyName };
-
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Authentication failed');
-      }
-
-      onLogin(data.user, data.token);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    console.log('Form submitted:', { email, password, name, agencyName });
+    alert(`${isLogin ? 'Login' : 'Registration'} submitted! Check console for details.`);
   };
 
   return (
@@ -92,16 +61,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             required
           />
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
-
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-colors"
           >
-            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Register')}
+            {isLogin ? 'Login' : 'Register'}
           </button>
         </form>
 
@@ -116,4 +80,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       </div>
     </div>
   );
-};
+}
+
+export default SimpleApp;

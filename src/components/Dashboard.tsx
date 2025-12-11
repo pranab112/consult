@@ -27,7 +27,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('/api/students', {
+      const response = await fetch('http://localhost:5001/api/students', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -46,7 +46,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/students', {
+      const response = await fetch('http://localhost:5001/api/students', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

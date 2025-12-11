@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Diagnosis</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        console.log('Script starting...');
+
+        const { useState } = React;
+        console.log('React imported:', !!React);
+        console.log('ReactDOM imported:', !!ReactDOM);
+
+        function StudyAbroadApp() {
+            console.log('Component rendering...');
+            const [isLogin, setIsLogin] = useState(true);
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+                    <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+                        <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                            StudyAbroad Genius - DIAGNOSIS
+                        </h2>
+                        <div className="space-y-4">
+                            <p>React Version: {React.version}</p>
+                            <p>Component Mounted: YES</p>
+                            <p>State Working: {isLogin ? 'YES' : 'NO'}</p>
+                        </div>
+                        <form className="space-y-4 mt-4">
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                            />
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                            />
+                            <button
+                                type="submit"
+                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold"
+                                onClick={(e) => { e.preventDefault(); alert('Form works!'); }}
+                            >
+                                {isLogin ? 'Login' : 'Register'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        console.log('About to find root element...');
+        const rootElement = document.getElementById('root');
+        console.log('Root element found:', !!rootElement);
+
+        if (rootElement) {
+            console.log('Creating React root...');
+            const root = ReactDOM.createRoot(rootElement);
+            console.log('Rendering app...');
+            root.render(<StudyAbroadApp />);
+            console.log('App rendered!');
+        } else {
+            console.error('Root element not found!');
+        }
+    </script>
+</body>
+</html>
