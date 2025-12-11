@@ -1,0 +1,38 @@
+# Use official Node.js image
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install dependencies
+RUN npm ci --production=false
+RUN cd backend && npm ci --production=false
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/backend ./backend
+COPY --from=builder /app/package*.json ./
+
+# Install production dependencies only
+RUN cd backend && npm ci --production
+
+# Expose port
+EXPOSE 5000
+
+# Start the application
+CMD ["npm", "start"]
