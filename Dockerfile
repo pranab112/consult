@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 
 # Force rebuild - cache bust
-ENV REBUILD_DATE=2025-12-11-8
+ENV REBUILD_DATE=2025-12-11-9
 
 # Set working directory
 WORKDIR /app
@@ -31,9 +31,13 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/package*.json ./backend/
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/start.sh ./
 
 # Install production dependencies only
 RUN cd backend && npm ci --production
 
+# Make start script executable
+RUN chmod +x start.sh
+
 # Start the application
-CMD ["npm", "start"]
+CMD ["./start.sh"]
