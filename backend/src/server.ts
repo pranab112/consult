@@ -20,18 +20,9 @@ const app = express();
 const server = createServer(app);
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
-// Middleware with relaxed CSP for development
+// Middleware - disable CSP for now to allow Tailwind CSS
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://unpkg.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"]
-    }
-  }
+  contentSecurityPolicy: false
 }));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
