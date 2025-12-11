@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import path from 'path';
 import { createServer } from 'http';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
@@ -44,6 +45,24 @@ app.use('/api/users', usersRouter);
 app.use('/api/students', studentsRouter);
 app.use('/api/documents', documentsRouter);
 app.use('/api/agencies', agenciesRouter);
+
+// Serve static files from React build
+const frontendPath = path.join(__dirname, '../../dist');
+app.use(express.static(frontendPath));
+
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  const indexPath = path.join(__dirname, '../../dist/index.html');
+  if (require('fs').existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).json({
+      message: 'Frontend not built. Run npm run build:frontend',
+      api: 'API is working at /api/*',
+      health: 'Check /health for status'
+    });
+  }
+});
 
 // Error handling
 app.use(errorHandler);
