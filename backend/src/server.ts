@@ -40,6 +40,22 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Test endpoint to verify deployment
+app.get('/test-deploy', (_req, res) => {
+  const fs = require('fs');
+  const distExists = fs.existsSync(path.join(__dirname, '../../dist'));
+  const indexExists = fs.existsSync(path.join(__dirname, '../../dist/index.html'));
+
+  res.json({
+    message: 'Testing deployment',
+    dirname: __dirname,
+    cwd: process.cwd(),
+    distExists,
+    indexExists,
+    files: fs.readdirSync(path.join(__dirname, '../..')).slice(0, 20)
+  });
+});
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
