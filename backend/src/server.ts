@@ -51,11 +51,24 @@ app.use(errorHandler);
 // Start server
 const startServer = async () => {
   try {
-    // Initialize database
-    await initDatabase();
+    // Initialize database (optional - continue if fails)
+    if (process.env.DATABASE_URL) {
+      try {
+        await initDatabase();
+        logger.info('Database connected successfully');
+      } catch (dbError) {
+        logger.warn('Database connection failed, running without database:', dbError);
+        logger.info('App will run with limited functionality - add PostgreSQL in Railway');
+      }
+    } else {
+      logger.warn('No DATABASE_URL found - add PostgreSQL in Railway dashboard');
+    }
 
     server.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+      if (!process.env.DATABASE_URL) {
+        logger.info('⚠️ Running without database - Add PostgreSQL in Railway for full functionality');
+      }
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
